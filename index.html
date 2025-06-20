@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Typing Test - LeadTyping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .correct { background-color: #d4edda; }
+    .incorrect { background-color: #f8d7da; }
+    .current { background-color: #fff3cd; border-bottom: 2px solid #ffc107; }
+    .ad-space { min-height: 100px; background: #f8f9fa; border: 2px dashed #dee2e6; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+  <!-- Header with Branding -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-orange-600">LeadTyping</h1>
+      <div class="text-sm text-gray-600">
+        <span class="hidden sm:inline">Free Typing Test • </span>
+        <span>Improve Your Speed</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Ad Space (Top) -->
+  <div class="max-w-6xl mx-auto px-4 py-2">
+    <div class="ad-space rounded-lg flex items-center justify-center text-gray-500 text-sm">
+      Advertisement Space (728x90)
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      
+      <!-- Main Content Area -->
+      <div class="lg:col-span-3">
+        
+        <!-- Settings Form -->
+        <div id="settingsForm" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Start Your Typing Test</h2>
+          
+          <form id="testForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                <input type="text" id="username" placeholder="Enter your name" 
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500" required />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Test Duration</label>
+                <select id="duration" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500">
+                  <option value="60">1 Minute</option>
+                  <option value="120">2 Minutes</option>
+                  <option value="300">5 Minutes</option>
+                  <option value="600">10 Minutes</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty Level</label>
+              <select id="difficulty" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500">
+                <option value="easy">Easy - Common words</option>
+                <option value="medium">Medium - Mixed vocabulary</option>
+                <option value="hard">Hard - Advanced text</option>
+              </select>
+            </div>
+            
+            <div class="pt-4">
+              <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                Start Typing Test
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Typing Test Area -->
+        <div id="typingTest" class="hidden space-y-6">
+          
+          <!-- Live Stats -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600" id="wpmDisplay">0</div>
+                <div class="text-sm text-gray-600">WPM</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-green-600" id="accuracyDisplay">100%</div>
+                <div class="text-sm text-gray-600">Accuracy</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-orange-600" id="progressDisplay">0%</div>
+                <div class="text-sm text-gray-600">Progress</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-red-600" id="timer">60</div>
+                <div class="text-sm text-gray-600">Time Left</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Text Display -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="font-semibold text-gray-700">Type the text below:</h3>
+                <div class="flex gap-2">
+                  <button onclick="goToMenu()" class="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg transition-colors">
+                    Menu
+                  </button>
+                  <button onclick="restartTest()" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg transition-colors">
+                    Restart
+                  </button>
+                </div>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="bg-orange-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            
+            <div id="textDisplay" class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 text-lg leading-relaxed font-mono min-h-32 max-h-48 overflow-y-auto break-words whitespace-pre-wrap">
+              Click "Start Typing Test" to begin...
+            </div>
+
+            <textarea id="inputArea" rows="4" placeholder="Start typing here..." 
+                      class="w-full border border-gray-300 rounded-lg p-4 text-lg font-mono resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" 
+                      disabled></textarea>
+          </div>
+
+          <!-- Results Modal Trigger -->
+          <div id="resultsArea" class="hidden bg-white rounded-xl shadow-lg p-6">
+            <div class="text-center">
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">Test Complete!</h3>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <div class="text-xl font-bold text-blue-600" id="finalWPM">0</div>
+                  <div class="text-sm text-gray-600">Final WPM</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                  <div class="text-xl font-bold text-green-600" id="finalAccuracy">100%</div>
+                  <div class="text-sm text-gray-600">Accuracy</div>
+                </div>
+                <div class="bg-orange-50 rounded-lg p-4">
+                  <div class="text-xl font-bold text-orange-600" id="totalWords">0</div>
+                  <div class="text-sm text-gray-600">Words Typed</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                  <div class="text-xl font-bold text-red-600" id="totalErrors">0</div>
+                  <div class="text-sm text-gray-600">Errors</div>
+                </div>
+              </div>
+              <div class="flex gap-4 justify-center">
+                <button onclick="restartTest()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold">
+                  Try Again
+                </button>
+                <button onclick="goToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold">
+                  Change Settings
+                </button>
+                <button onclick="shareResults()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold">
+                  Share Results
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Ad Space (Sidebar) -->
+        <div class="ad-space rounded-lg flex items-center justify-center text-gray-500 text-sm">
+          Advertisement<br>(300x250)
+        </div>
+        
+        <!-- Quick Difficulty Change -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <h3 class="font-semibold text-gray-800 mb-3">Quick Difficulty Change</h3>
+          <div class="space-y-2">
+            <button onclick="changeDifficulty('easy')" class="w-full text-left text-sm bg-green-50 hover:bg-green-100 text-green-700 p-2 rounded">Easy Level</button>
+            <button onclick="changeDifficulty('medium')" class="w-full text-left text-sm bg-yellow-50 hover:bg-yellow-100 text-yellow-700 p-2 rounded">Medium Level</button>
+            <button onclick="changeDifficulty('hard')" class="w-full text-left text-sm bg-red-50 hover:bg-red-100 text-red-700 p-2 rounded">Hard Level</button>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <h3 class="font-semibold text-gray-800 mb-3">Quick Tips</h3>
+          <ul class="text-sm text-gray-600 space-y-2">
+            <li>• Keep your fingers on home row</li>
+            <li>• Don't look at keyboard</li>
+            <li>• Maintain steady rhythm</li>
+            <li>• Focus on accuracy first</li>
+            <li>• Take breaks regularly</li>
+          </ul>
+        </div>
+
+        <!-- Popular Tests -->
+        <div class="bg-white rounded-xl shadow-lg p-4">
+          <h3 class="font-semibold text-gray-800 mb-3">Custom Tests</h3>
+          <div class="space-y-2">
+            <button onclick="customTest('programming')" class="w-full text-left text-sm bg-purple-50 hover:bg-purple-100 text-purple-700 p-2 rounded">Programming Code</button>
+            <button onclick="customTest('quotes')" class="w-full text-left text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 p-2 rounded">Famous Quotes</button>
+            <button onclick="customTest('numbers')" class="w-full text-left text-sm bg-teal-50 hover:bg-teal-100 text-teal-700 p-2 rounded">Numbers & Symbols</button>
+            <button onclick="customTest('business')" class="w-full text-left text-sm bg-orange-50 hover:bg-orange-100 text-orange-700 p-2 rounded">Business Writing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-12">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-center text-sm text-gray-600">
+      <p>© 2025 LeadTyping. All rights reserved. | Free Typing Test | Improve Your Typing Speed</p>
+    </div>
+  </footer>
+
+<script>
+const testForm = document.getElementById("testForm");
+const settingsForm = document.getElementById("settingsForm");
+const testContainer = document.getElementById("typingTest");
+const textDisplay = document.getElementById("textDisplay");
+const inputArea = document.getElementById("inputArea");
+const wpmDisplay = document.getElementById("wpmDisplay");
+const accuracyDisplay = document.getElementById("accuracyDisplay");
+const progressDisplay = document.getElementById("progressDisplay");
+const timerDisplay = document.getElementById("timer");
+const progressBar = document.getElementById("progressBar");
+const resultsArea = document.getElementById("resultsArea");
+
+let testDuration = 60;
+let timeLeft = 60;
+let currentText = "";
+let timerInterval = null;
+let testStarted = false;
+let startTime = null;
+let totalErrors = 0;
+let currentDifficulty = "medium"; // Store current difficulty
+
+const texts = {
+  easy: [
+    "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet and is perfect for typing practice. Many people use this phrase to test keyboards and fonts.",
+    "Today is a beautiful day for learning new skills. Practice makes perfect when it comes to typing. The more you type, the faster you will become. Remember to keep your fingers on the home row.",
+    "Computers have changed the way we work and communicate. Email, social media, and instant messaging require good typing skills. Fast typing can save you time and increase productivity.",
+    "Learning to type without looking at the keyboard is an important skill. Touch typing helps you write faster and more efficiently. Start slowly and focus on accuracy before speed.",
+    "Reading books is one of the best ways to improve vocabulary and writing skills. Books open new worlds and teach us about different cultures and ideas. Make reading a daily habit.",
+    "Exercise is important for maintaining good health. Regular physical activity helps strengthen muscles and bones. It also improves mental health and reduces stress levels.",
+  ],
+  medium: [
+    "Technology continues to evolve at an unprecedented pace, transforming industries and reshaping the global economy. Artificial intelligence, machine learning, and automation are becoming integral parts of modern businesses.",
+    "Environmental conservation has become a critical issue in the 21st century. Climate change, deforestation, and pollution threaten the planet's biodiversity and sustainability for future generations.",
+    "Education systems worldwide are adapting to digital transformation. Online learning platforms, virtual classrooms, and interactive technologies are revolutionizing traditional teaching methods and student engagement.",
+    "The healthcare industry is experiencing revolutionary changes through telemedicine and digital health solutions. Remote patient monitoring and AI-powered diagnostics are improving access to quality medical care.",
+    "Space exploration has entered a new era with private companies joining government agencies. Mars missions, lunar bases, and asteroid mining represent the next frontier of human achievement and scientific discovery.",
+    "Social media platforms have fundamentally altered how people communicate and share information. These digital networks influence public opinion, political movements, and cultural trends across the globe.",
+  ],
+  hard: [
+    "The epistemological implications of quantum mechanics continue to perplex philosophers and physicists alike. The Copenhagen interpretation suggests that observation fundamentally alters reality, challenging our conventional understanding of objectivity and measurement.",
+    "Neuroplasticity research has revealed the brain's remarkable capacity for reorganization throughout life. Synaptic pruning, dendritic branching, and neurogenesis demonstrate the complex mechanisms underlying learning and memory consolidation.",
+    "Cryptocurrency blockchain technology utilizes cryptographic hash functions and distributed consensus algorithms to maintain decentralized ledgers. Smart contracts enable autonomous execution of predetermined conditions without intermediary oversight.",
+    "Phenomenological hermeneutics examines the interpretive structures inherent in human consciousness and experience. This philosophical approach investigates how meaning emerges through the dialectical relationship between understanding and historical context.",
+    "Mitochondrial dysfunction has been implicated in numerous pathophysiological processes, including oxidative stress, apoptosis, and cellular senescence. These organelles serve as critical regulators of cellular metabolism and energy homeostasis.",
+    "Postcolonial literary criticism deconstructs hegemonic narratives embedded within canonical texts, revealing how imperial ideologies perpetuate cultural marginalization and epistemological violence against subaltern populations.",
+  ],
+  // Custom text categories
+  programming: [
+    "function calculateTotal(items) { return items.reduce((sum, item) => sum + item.price, 0); } const users = await database.query('SELECT * FROM users WHERE active = true'); if (response.status === 200) { console.log('Success'); }",
+    "class APIHandler { constructor(baseURL) { this.baseURL = baseURL; } async getData(endpoint) { const response = await fetch(`${this.baseURL}/${endpoint}`); return response.json(); } } const api = new APIHandler('https://api.example.com');",
+    "import React, { useState, useEffect } from 'react'; const UserProfile = ({ userId }) => { const [user, setUser] = useState(null); useEffect(() => { fetchUserData(userId).then(setUser); }, [userId]); return <div>{user?.name}</div>; };",
+    "def process_data(data_list): filtered_data = [item for item in data_list if item['status'] == 'active'] return sorted(filtered_data, key=lambda x: x['timestamp'], reverse=True) result = process_data(user_data)",
+    "SELECT u.name, COUNT(o.id) as order_count FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.created_at >= '2024-01-01' GROUP BY u.id HAVING COUNT(o.id) > 5 ORDER BY order_count DESC;",
+    "git add . && git commit -m 'Add new feature: user authentication with JWT tokens' && git push origin feature/auth-system && echo 'Deployment complete' || echo 'Deployment failed'",
+  ],
+  quotes: [
+    "Be yourself; everyone else is already taken. - Oscar Wilde. The only way to do great work is to love what you do. - Steve Jobs. In the middle of difficulty lies opportunity. - Albert Einstein.",
+    "Life is what happens to you while you're busy making other plans. - John Lennon. The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt. It is during our darkest moments that we must focus to see the light. - Aristotle.",
+    "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill. The only impossible journey is the one you never begin. - Tony Robbins. Believe you can and you're halfway there. - Theodore Roosevelt.",
+    "The way to get started is to quit talking and begin doing. - Walt Disney. Innovation distinguishes between a leader and a follower. - Steve Jobs. Your time is limited, don't waste it living someone else's life. - Steve Jobs.",
+    "Twenty years from now you will be more disappointed by the things you didn't do than by the ones you did do. - Mark Twain. The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb.",
+    "Don't watch the clock; do what it does. Keep going. - Sam Levenson. Whether you think you can or you think you can't, you're right. - Henry Ford. The only person you are destined to become is the person you decide to be. - Ralph Waldo Emerson.",
+  ],
+  numbers: [
+    "Invoice #12345: $1,234.56 due by 2024-03-15. Account: 9876543210. Contact: +1-555-123-4567 ext. 890. Reference: TR-2024-Q1-001. Tax ID: 98-7654321. Routing: 123456789. Swift: ABCD1234.",
+    "Order #ORD-789012: 15 items @ $29.99 each = $449.85 + $67.48 tax = $517.33 total. Payment: ****-****-****-1234. Confirmation: CNF-456789. Tracking: 1Z999AA1234567890. Delivery: 2024-06-20.",
+    "IP Address: 192.168.1.1:8080. MAC: 00:1B:44:11:3A:B7. UUID: 550e8400-e29b-41d4-a716-446655440000. API  Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.",
+    "Coordinates: 40.7128° N, 74.0060° W. Elevation: 33 ft. Distance: 2.5 km. Speed: 65 mph. Time: 14:30:25 UTC. Temperature: 72°F / 22°C. Pressure: 1013.25 hPa. Humidity: 68%.",
+    "Version: 2.4.1-beta.3. Build: #20240315-1432. Commit: a1b2c3d4e5f6. Size: 1,024 KB. Memory: 512 MB. CPU: 2.4 GHz. Processes: 47. Threads: 128. Uptime: 7d 14h 23m 45s.",
+    "Portfolio: AAPL $150.25 (+2.5%), GOOGL $2,750.80 (-1.2%), MSFT $305.15 (+0.8%). Balance: $25,847.92. P&L: +$1,293.45 (5.27%). Volume: 1,234,567 shares. Market Cap: $2.8T.",
+  ],
+  business: [
+    "Dear valued stakeholder, we are pleased to announce our quarterly earnings report for Q1 2024. Revenue increased by 15.3% year-over-year, reaching $2.4 million. Our strategic initiatives have resulted in improved operational efficiency and enhanced customer satisfaction.",
+    "Following extensive market research and competitive analysis, we recommend expanding our product line to include eco-friendly alternatives. This initiative aligns with our corporate sustainability goals and addresses growing consumer demand for environmentally conscious products.",
+    "The project timeline has been updated to reflect recent scope changes. Phase 1 deliverables are due March 15th, with stakeholder review scheduled for March 20th. Budget allocation requires approval from the finance committee before proceeding to implementation.",
+    "Our customer retention rate has improved by 23% since implementing the new CRM system. Key performance indicators show increased engagement across all touchpoints. We anticipate continued growth in customer lifetime value through enhanced personalization strategies.",
+    "Please find attached the proposal for our digital transformation initiative. The implementation will require cross-functional collaboration between IT, marketing, and operations teams. Expected ROI is 275% within 18 months of deployment.",
+    "We are conducting a comprehensive audit of our supply chain processes to identify optimization opportunities. Initial findings suggest potential cost savings of 12-18% through vendor consolidation and improved inventory management protocols.",
+  ]
+};
+
+// Function to get random text based on difficulty
+function getRandomText(difficulty) {
+  const selectedTexts = texts[difficulty];
+  return selectedTexts[Math.floor(Math.random() * selectedTexts.length)];
+}
+
+// Form submission
+testForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  
+  const name = document.getElementById("username").value.trim();
+  const duration = parseInt(document.getElementById("duration").value);
+  const difficulty = document.getElementById("difficulty").value;
+
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  startTest(name, duration, difficulty);
+});
+
+// Custom test function
+function customTest(category) {
+  document.getElementById("username").value = "Custom Test User";
+  document.getElementById("duration").value = 120; // 2 minutes default for custom tests
+  document.getElementById("difficulty").value = "medium"; // Will be overridden
+  
+  // Start test with custom category
+  startCustomTest("Custom Test User", 120, category);
+}
+
+function startCustomTest(name, duration, category) {
+  testDuration = duration;
+  timeLeft = duration;
+  totalErrors = 0;
+  testStarted = false;
+  startTime = null;
+  currentDifficulty = category; // Store the custom category
+  
+  // Select random text from custom category
+  currentText = getRandomText(category);
+
+  // Show test UI and hide form
+  settingsForm.classList.add("hidden");
+  testContainer.classList.remove("hidden");
+
+  // Initialize display
+  updateTextDisplay();
+  inputArea.value = "";
+  inputArea.disabled = false;
+  inputArea.focus();
+
+  // Reset stats
+  timerDisplay.textContent = timeLeft;
+  wpmDisplay.textContent = "0";
+  accuracyDisplay.textContent = "100%";
+  progressDisplay.textContent = "0%";
+  progressBar.style.width = "0%";
+  resultsArea.classList.add("hidden");
+
+  // Clear any existing timer
+  clearInterval(timerInterval);
+}
+
+// Quick test buttons - keeping the original functionality too
+function quickTest(minutes) {
+  document.getElementById("username").value = "Quick Test User";
+  document.getElementById("duration").value = minutes * 60;
+  document.getElementById("difficulty").value = "medium";
+  
+  const event = new Event('submit');
+  testForm.dispatchEvent(event);
+}
+
+function startTest(name, duration, difficulty) {
+  testDuration = duration;
+  timeLeft = duration;
+  totalErrors = 0;
+  testStarted = false;
+  startTime = null;
+  currentDifficulty = difficulty; // Store the difficulty
+  
+  // Select random text based on difficulty
+  currentText = getRandomText(difficulty);
+
+  // Show test UI and hide form
+  settingsForm.classList.add("hidden");
+  testContainer.classList.remove("hidden");
+
+  // Initialize display
+  updateTextDisplay();
+  inputArea.value = "";
+  inputArea.disabled = false;
+  inputArea.focus();
+
+  // Reset stats
+  timerDisplay.textContent = timeLeft;
+  wpmDisplay.textContent = "0";
+  accuracyDisplay.textContent = "100%";
+  progressDisplay.textContent = "0%";
+  progressBar.style.width = "0%";
+  resultsArea.classList.add("hidden");
+
+  // Clear any existing timer
+  clearInterval(timerInterval);
+}
+
+// Input handling
+inputArea.addEventListener("input", () => {
+  if (!testStarted) {
+    testStarted = true;
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+  
+  updateDisplay();
+  updateTextDisplay();
+});
+
+function updateTextDisplay() {
+  const typed = inputArea.value;
+  let html = "";
+  
+  for (let i = 0; i < currentText.length; i++) {
+    const char = currentText[i];
+    
+    if (i < typed.length) {
+      if (typed[i] === char) {
+        html += `<span class="correct">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+      } else {
+        html += `<span class="incorrect">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+      }
+    } else if (i === typed.length) {
+      html += `<span class="current">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+    } else {
+      html += char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char;
+    }
+  }
+  
+  textDisplay.innerHTML = html;
+  
+  // Scroll the current character into view smoothly
+  const currentChar = textDisplay.querySelector('.current');
+  if (currentChar) {
+    // Use a small delay to ensure smooth scrolling
+    setTimeout(() => {
+      const container = textDisplay;
+      const rect = currentChar.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      if (rect.bottom > containerRect.bottom || rect.top < containerRect.top) {
+        currentChar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 10);
+  }
+}
+
+function updateDisplay() {
+  const typed = inputArea.value;
+  let correctChars = 0;
+  let errors = 0;
+
+  // Calculate accuracy
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) {
+      correctChars++;
+    } else {
+      errors++;
+    }
+  }
+
+  totalErrors = errors;
+  
+  // Calculate WPM
+  const timeSpent = testStarted ? (Date.now() - startTime) / 1000 / 60 : 0;
+  const wordsTyped = typed.length / 5;
+  const wpm = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  // Calculate accuracy
+  const accuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Calculate progress
+  const progress = Math.round((typed.length / currentText.length) * 100);
+  
+  // Update displays
+  wpmDisplay.textContent = wpm;
+  accuracyDisplay.textContent = `${accuracy}%`;
+  progressDisplay.textContent = `${Math.min(progress, 100)}%`;
+  progressBar.style.width = `${Math.min(progress, 100)}%`;
+  
+  // Check if test is complete
+  if (typed.length >= currentText.length) {
+    finishTest();
+  }
+}
+
+function updateTimer() {
+  timeLeft--;
+  timerDisplay.textContent = timeLeft;
+
+  if (timeLeft <= 0) {
+    finishTest();
+  }
+}
+
+function finishTest() {
+  clearInterval(timerInterval);
+  inputArea.disabled = true;
+  
+  // Calculate final stats
+  const typed = inputArea.value;
+  const timeSpent = (testDuration - timeLeft) / 60;
+  const wordsTyped = typed.length / 5;
+  const finalWPM = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  let correctChars = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) correctChars++;
+  }
+  
+  const finalAccuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Show results
+  document.getElementById("finalWPM").textContent = finalWPM;
+  document.getElementById("finalAccuracy").textContent = `${finalAccuracy}%`;
+  document.getElementById("totalWords").textContent = Math.round(wordsTyped);
+  document.getElementById("totalErrors").textContent = totalErrors;
+  
+  resultsArea.classList.remove("hidden");
+  
+  // Scroll to results
+  resultsArea.scrollIntoView({ behavior: 'smooth' });
+}
+
+function goToMenu() {
+  // Clear any running timer
+  clearInterval(timerInterval);
+  
+  // Show settings form and hide test
+  settingsForm.classList.remove("hidden");
+  testContainer.classList.add("hidden");
+  
+  // Reset form with current values for easy editing
+  // Keep the current values so user can modify them
+  if (!document.getElementById("username").value) {
+    document.getElementById("username").value = "Test User";
+  }
+  // Duration and difficulty will keep their current values
+  
+  // Focus on username field for quick editing
+  document.getElementById("username").focus();
+}
+
+function changeDifficulty(newDifficulty) {
+  // Only work if test is running
+  if (testContainer.classList.contains("hidden")) {
+    return; // Test not running
+  }
+  
+  // Clear any running timer
+  clearInterval(timerInterval);
+  
+  // Get current settings
+  const name = document.getElementById("username").value || "Test User";
+  const duration = parseInt(document.getElementById("duration").value) || 60;
+  
+  // Update difficulty in the form
+  document.getElementById("difficulty").value = newDifficulty;
+  
+  // Start new test with new difficulty
+  startTest(name, duration, newDifficulty);
+}
+
+function restartTest() {
+  // Instead of reloading the page, restart with current settings and new random text
+  clearInterval(timerInterval);
+  
+  // Get current settings
+  const name = document.getElementById("username").value || "Test User";
+  const duration = parseInt(document.getElementById("duration").value) || 60;
+  const difficulty = currentDifficulty;
+  
+  // Start new test with random text
+  startTest(name, duration, difficulty);
+}
+
+function shareResults() {
+  const wpm = document.getElementById("finalWPM").textContent;
+  const accuracy = document.getElementById("finalAccuracy").textContent;
+  const text = `I just completed a typing test on LeadTyping! 🎯\n\nMy Results:\n⚡ Speed: ${wpm} WPM\n🎯 Accuracy: ${accuracy}\n\nTry it yourself at LeadTyping!`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'My Typing Test Results',
+      text: text,
+      url: window.location.href
+    });
+  } else {
+    // Fallback - copy to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Results copied to clipboard!');
+    });
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !settingsForm.classList.contains('hidden')) {
+    restartTest();
+  }
+});
+
+</script>
+
+</body>
+</html>
