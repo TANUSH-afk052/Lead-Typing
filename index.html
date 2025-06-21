@@ -10,6 +10,23 @@
     .incorrect { background-color: #f8d7da; }
     .current { background-color: #fff3cd; border-bottom: 2px solid #ffc107; }
     .ad-space { min-height: 100px; background: #f8f9fa; border: 2px dashed #dee2e6; }
+    .leaderboard-entry { 
+      transition: all 0.3s ease; 
+    }
+    .leaderboard-entry:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    }
+    .trophy { font-size: 1.5rem; }
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4e); }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e5e5e5); }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa520); }
+    .pulse-animation { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen">
@@ -171,6 +188,30 @@
       
 
       <!-- Sidebar -->
+       <div class="bg-white rounded-xl shadow-lg p-4">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="font-semibold text-gray-800">🏆 Leaderboard</h3>
+    <button onclick="toggleLeaderboard()" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded">
+      <span id="leaderboardToggle">Show All</span>
+    </button>
+  </div>
+  
+  <div id="leaderboardContainer">
+    <div id="topScores" class="space-y-2">
+      <!-- Top scores will be populated here -->
+    </div>
+    
+    <div id="allScores" class="hidden space-y-2 max-h-64 overflow-y-auto">
+      <!-- All scores will be populated here -->
+    </div>
+    
+    <div class="text-center mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-500">
+        Scores saved locally on your device
+      </p>
+    </div>
+  </div>
+</div>
       <div class="lg:col-span-1 space-y-6">
         <!-- Ad Space (Sidebar) -->
         <div class="ad-space rounded-lg flex items-center justify-center text-gray-500 text-sm">
@@ -216,7 +257,7 @@
   <!-- Footer -->
   <footer class="bg-white border-t mt-12">
     <div class="max-w-6xl mx-auto px-4 py-6 text-center text-sm text-gray-600">
-      <p>© 2025 LeadTyping. All rights reserved. | Free Typing Test | Improve Your Typing Speed (made by thanos)</p>
+      <p>© 2025 LeadTyping. All rights reserved. | Free Typing Test | Improve Your Typing Speed</p>
     </div>
   </footer>
 
@@ -614,7 +655,170 @@ document.addEventListener('keydown', (e) => {
     restartTest();
   }
 });
+function saveScore(name, wpm, accuracy, difficulty, duration) {
+  const score = {
+    name: name,
+    wpm: parseInt(wpm),
+    accuracy: parseInt(accuracy),
+    difficulty: difficulty,
+    duration: duration,
+    date: new Date().toISOString().split('T')[0],
+    timestamp: Date.now()
+  };
+  
+  let scores = getStoredScores();
+  scores.push(score);
+  
+  // Keep only top 100 scores to prevent storage issues
+  scores.sort((a, b) => {
+    if (b.wpm !== a.wpm) return b.wpm - a.wpm;
+    return b.accuracy - a.accuracy;
+  });
+  scores = scores.slice(0, 100);
+  
+  localStorage.setItem('typingTestScores', JSON.stringify(scores));
+  updateLeaderboard();
+  
+  // Show save confirmation
+  showScoreSaved();
+}
 
+function getStoredScores() {
+  try {
+    return JSON.parse(localStorage.getItem('typingTestScores') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function updateLeaderboard() {
+  const scores = getStoredScores();
+  const topScoresContainer = document.getElementById('topScores');
+  const allScoresContainer = document.getElementById('allScores');
+  
+  // Clear existing content
+  topScoresContainer.innerHTML = '';
+  allScoresContainer.innerHTML = '';
+  
+  if (scores.length === 0) {
+    topScoresContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">No scores yet. Be the first!</p>';
+    return;
+  }
+  
+  // Show top 3
+  scores.slice(0, 3).forEach((score, index) => {
+    const entry = createLeaderboardEntry(score, index + 1, true);
+    topScoresContainer.appendChild(entry);
+  });
+  
+  // Show all scores
+  scores.forEach((score, index) => {
+    const entry = createLeaderboardEntry(score, index + 1, false);
+    allScoresContainer.appendChild(entry);
+  });
+}
+
+function createLeaderboardEntry(score, rank, isTop) {
+  const entry = document.createElement('div');
+  const rankClass = rank <= 3 ? `rank-${rank}` : '';
+  const trophy = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+  
+  entry.className = `leaderboard-entry p-2 rounded text-sm ${rankClass}`;
+  entry.innerHTML = `
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="trophy font-bold">${trophy}</span>
+        <div>
+          <div class="font-medium">${score.name}</div>
+          <div class="text-xs opacity-75">${score.difficulty} • ${score.duration/60}min</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="font-bold">${score.wpm} WPM</div>
+        <div class="text-xs opacity-75">${score.accuracy}%</div>
+      </div>
+    </div>
+  `;
+  
+  return entry;
+}
+
+function toggleLeaderboard() {
+  const allScores = document.getElementById('allScores');
+  const toggle = document.getElementById('leaderboardToggle');
+  
+  if (allScores.classList.contains('hidden')) {
+    allScores.classList.remove('hidden');
+    toggle.textContent = 'Show Less';
+  } else {
+    allScores.classList.add('hidden');
+    toggle.textContent = 'Show All';
+  }
+}
+
+function showScoreSaved() {
+  // Create temporary notification
+  const notification = document.createElement('div');
+  notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 pulse-animation';
+  notification.textContent = '🎉 Score saved to leaderboard!';
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// 4. MODIFY YOUR EXISTING finishTest() FUNCTION
+// Replace your existing finishTest function with this updated version:
+
+function finishTest() {
+  clearInterval(timerInterval);
+  inputArea.disabled = true;
+  
+  // Calculate final stats
+  const typed = inputArea.value;
+  const timeSpent = (testDuration - timeLeft) / 60;
+  const wordsTyped = typed.length / 5;
+  const finalWPM = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  let correctChars = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) correctChars++;
+  }
+  
+  const finalAccuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Show results
+  document.getElementById("finalWPM").textContent = finalWPM;
+  document.getElementById("finalAccuracy").textContent = `${finalAccuracy}%`;
+  document.getElementById("totalWords").textContent = Math.round(wordsTyped);
+  document.getElementById("totalErrors").textContent = totalErrors;
+  
+  // Save score to leaderboard
+  const playerName = document.getElementById("username").value || "Anonymous";
+  saveScore(playerName, finalWPM, finalAccuracy, currentDifficulty, testDuration);
+  
+  resultsArea.classList.remove("hidden");
+  
+  // Scroll to results
+  resultsArea.scrollIntoView({ behavior: 'smooth' });
+}
+
+// 5. ADD THIS TO INITIALIZE LEADERBOARD WHEN PAGE LOADS
+// Add this at the very end of your script tag:
+
+// Initialize leaderboard when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  updateLeaderboard();
+});
+
+// Optional: Add clear leaderboard function (you can add a button for this)
+function clearLeaderboard() {
+  if (confirm('Are you sure you want to clear all scores? This cannot be undone.')) {
+    localStorage.removeItem('typingTestScores');
+    updateLeaderboard();
+  }
+}
 </script>
 
 </body>
