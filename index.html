@@ -191,15 +191,12 @@
        <div class="bg-white rounded-xl shadow-lg p-4">
   <div class="flex items-center justify-between mb-3">
     <h3 class="font-semibold text-gray-800">🏆 Leaderboard</h3>
-    <button onclick="toggleLeaderboard()" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded">
-      <span id="leaderboardToggle">Show All</span>
-    </button>
   </div>
   
-  <div id="leaderboardContainer">
-    <div id="topScores" class="space-y-2">
-      <!-- Top scores will be populated here -->
-    </div>
+  <div id="leaderboardContainer" class="max-h-96 overflow-y-auto border rounded p-4 bg-white shadow">
+    <div id="allScores"></div>
+  </div>
+
     
     <div id="allScores" class="hidden space-y-2 max-h-64 overflow-y-auto">
       <!-- All scores will be populated here -->
@@ -212,6 +209,10 @@
     </div>
   </div>
 </div>
+  <button onclick="resetLeaderboard()" class="bg-red-500 text-white px-4 py-2 rounded mt-4 hover:bg-red-600">
+    Reset Leaderboard
+  </button>
+
       <div class="lg:col-span-1 space-y-6">
         <!-- Ad Space (Sidebar) -->
         <div class="ad-space rounded-lg flex items-center justify-center text-gray-500 text-sm">
@@ -691,32 +692,39 @@ function getStoredScores() {
   }
 }
 
+
 function updateLeaderboard() {
-  const scores = getStoredScores();
-  const topScoresContainer = document.getElementById('topScores');
+  const scores = getStoredScores(); // Assume this returns an array of score objects
   const allScoresContainer = document.getElementById('allScores');
-  
+
   // Clear existing content
-  topScoresContainer.innerHTML = '';
   allScoresContainer.innerHTML = '';
-  
+
   if (scores.length === 0) {
-    topScoresContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">No scores yet. Be the first!</p>';
+    allScoresContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">No scores yet. Be the first!</p>';
     return;
   }
-  
-  // Show top 3
-  scores.slice(0, 3).forEach((score, index) => {
-    const entry = createLeaderboardEntry(score, index + 1, true);
-    topScoresContainer.appendChild(entry);
-  });
-  
-  // Show all scores
+
+  // Show all scores with scrollable container
   scores.forEach((score, index) => {
-    const entry = createLeaderboardEntry(score, index + 1, false);
+    const entry = createLeaderboardEntry(score, index + 1, false); // false: not top-only styling
     allScoresContainer.appendChild(entry);
   });
 }
+
+
+
+function resetLeaderboard() {
+  const confirmed = confirm("Are you sure you want to reset the leaderboard?");
+  if (confirmed) {
+    localStorage.removeItem('typingTestScores'); // ✅ Must match getStoredScores()
+    updateLeaderboard(); // ✅ Refresh the UI
+  }
+}
+
+
+
+
 
 function createLeaderboardEntry(score, rank, isTop) {
   const entry = document.createElement('div');
@@ -743,18 +751,6 @@ function createLeaderboardEntry(score, rank, isTop) {
   return entry;
 }
 
-function toggleLeaderboard() {
-  const allScores = document.getElementById('allScores');
-  const toggle = document.getElementById('leaderboardToggle');
-  
-  if (allScores.classList.contains('hidden')) {
-    allScores.classList.remove('hidden');
-    toggle.textContent = 'Show Less';
-  } else {
-    allScores.classList.add('hidden');
-    toggle.textContent = 'Show All';
-  }
-}
 
 function showScoreSaved() {
   // Create temporary notification
@@ -820,7 +816,6 @@ function clearLeaderboard() {
   }
 }
 </script>
-<p>bhavesh</p>
 
 </body>
 </html>
