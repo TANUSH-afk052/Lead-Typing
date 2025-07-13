@@ -74,5 +74,736 @@
   <footer class="text-center text-sm text-gray-600 py-6 bg-white border-t">
     © 2025 LeadTyping. All rights reserved.
   </footer>
+<<<<<<< Updated upstream
+=======
+
+<script>
+const testForm = document.getElementById("testForm");
+const settingsForm = document.getElementById("settingsForm");
+const testContainer = document.getElementById("typingTest");
+const textDisplay = document.getElementById("textDisplay");
+const inputArea = document.getElementById("inputArea");
+const wpmDisplay = document.getElementById("wpmDisplay");
+const accuracyDisplay = document.getElementById("accuracyDisplay");
+const progressDisplay = document.getElementById("progressDisplay");
+const timerDisplay = document.getElementById("timer");
+const progressBar = document.getElementById("progressBar");
+const resultsArea = document.getElementById("resultsArea");
+
+let testDuration = 60;
+let timeLeft = 60;
+let currentText = "";
+let timerInterval = null;
+let testStarted = false;
+let startTime = null;
+let totalErrors = 0;
+let currentDifficulty = "medium"; // Store current difficulty
+
+const texts = {
+  easy: [
+    "The sun is shining and the sky is blue. Birds are flying high in the sky. Children are playing happily in the park. It is a perfect day to enjoy nature.",
+
+    "Typing is a helpful skill that you can use every day. It helps you write faster and more clearly. Practice a little bit each day to see big results over time.",
+
+    "Reading books is a great way to learn new things. You can visit new places and meet new people through stories. Books make your mind stronger and your vocabulary better.",
+
+    "I like to walk in the morning when everything is calm. The fresh air feels nice and the birds sing songs. It helps me start my day with energy and peace.",
+
+    "Fruits like apples, bananas, and oranges are healthy snacks. They give you vitamins, energy, and keep you feeling fresh. Eating fruits daily is good for your body and mind.",
+
+    "A clean room makes you feel happy and relaxed. Put your things in the right place. Make your bed every morning and keep your desk neat.",
+
+    "The dog barked at the cat, but the cat ran up the tree. The bird on the branch kept singing. It was a funny scene to watch in the backyard.",
+
+    "Water is important for your body. You should drink at least eight glasses a day. Water keeps you cool, fresh, and focused throughout the day.",
+
+    "School is a place where we learn and grow. Teachers help us understand new ideas. Friends make learning fun and school days full of joy.",
+
+    "Always do your best in whatever you do. Work hard, stay kind, and believe in yourself. Even small steps take you closer to your dreams.",
+
+    "When it rains, I like to watch the drops on the window. The trees look clean and the ground smells fresh. A hot cup of tea makes the day perfect.",
+
+    "Look at the stars shining bright in the night sky. The moon looks calm and quiet. I like to sit by the window and enjoy the peaceful night.",
+
+    "Cooking with family can be fun and tasty. We make sandwiches, cut fruits, and drink juice. Everyone smiles when we eat together at the table.",
+
+    "My bicycle is red and shiny. I ride it to the park every weekend. Riding fast with the wind blowing feels like flying.",
+
+    "Always speak kindly to others. Words can hurt or heal. A simple smile or thank you can make someone’s day better.",
+
+    "The beach is a wonderful place to relax. The sound of waves is peaceful and calming. I love building sandcastles and collecting seashells.",
+
+    "We went shopping and bought some clothes and toys. The shop was busy but fun to visit. Ice cream after shopping made the day even better.",
+
+    "Our garden is full of flowers and butterflies. Bees buzz from one flower to another. We water the plants every morning before school.",
+
+    "Grandparents tell the best stories at night. They make us laugh and teach us important lessons. I love spending time with them.",
+
+    "In the kitchen, I helped make pancakes with my sister. We added honey and fruits on top. It was the best breakfast ever.",
+
+    "Watching cartoons on Sunday is my favorite time. We sit together and laugh out loud. Popcorn and fun make it special.",
+
+    "The library is quiet and peaceful. People read books and work on computers. I like the smell of old books and the soft chairs.",
+
+    "We decorated the house for the festival. Lights, colors, and sweets made everyone smile. Celebrations bring families close.",
+
+    "Our class went on a picnic to the lake. We played games, ate lunch, and took photos. It was a day to remember forever.",
+
+    "Music makes everything better. I listen to soft tunes while studying. Songs help me relax and feel good inside.",
+
+    "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet and is perfect for typing practice. Many people use this phrase to test keyboards and fonts.",
+
+    "Today is a beautiful day for learning new skills. Practice makes perfect when it comes to typing. The more you type, the faster you will become. Remember to keep your fingers on the home row.",
+
+    "Computers have changed the way we work and communicate. Email, social media, and instant messaging require good typing skills. Fast typing can save you time and increase productivity.",
+
+    "Learning to type without looking at the keyboard is an important skill. Touch typing helps you write faster and more efficiently. Start slowly and focus on accuracy before speed.",
+
+    "Reading books is one of the best ways to improve vocabulary and writing skills. Books open new worlds and teach us about different cultures and ideas. Make reading a daily habit.",
+
+    "Exercise is important for maintaining good health. Regular physical activity helps strengthen muscles and bones. It also improves mental health and reduces stress levels.",
+
+  ],
+  medium: [
+    "Technology has made communication faster than ever. We can call, text, or video chat instantly. Staying connected is now easier than before, no matter the distance.",
+
+    "The internet is a powerful tool for learning. You can search for answers, take courses, and watch tutorials. It has changed the way we study and grow our skills.",
+
+    "Exercise helps the body stay strong and healthy. Walking, running, or playing sports can improve your mood. Just thirty minutes a day can make a big difference.",
+
+    "Social media lets people share moments and ideas. But spending too much time online can affect sleep and focus. Balance is key when using digital platforms.",
+
+    "Clean energy sources like wind and solar are important. They reduce pollution and help the planet. Many countries are switching to renewable power.",
+
+    "Traveling helps us explore new cultures and places. You can try new foods, learn different languages, and meet people. It opens your mind and builds memories.",
+
+    "Time management helps you get more done in less time. Making a schedule keeps you focused and reduces stress. Use a planner to stay on track.",
+
+    "Teamwork is important in school and work. When people share ideas and listen to each other, great things happen. A team can solve problems faster together.",
+
+    "Reading news every day keeps you informed. It helps you understand current events and global issues. Try reading from trusted sources for accurate facts.",
+
+    "Learning a new language takes patience and practice. Start with common words and phrases. Listening and speaking every day helps you improve quickly.",
+
+    "Music has the power to change your mood. A happy song can lift your spirits, while calm music can help you relax. Everyone has their favorite tunes.",
+
+    "Cooking at home is fun and healthy. You can try new recipes and control the ingredients. Sharing meals with family builds stronger bonds.",
+
+    "Recycling helps protect the environment. Separating plastic, paper, and metal is a simple habit. Small actions like this can make a big impact.",
+
+    "Books take us on adventures without leaving home. They teach lessons, build imagination, and help us understand different lives.",
+
+    "Robots are being used in factories, homes, and hospitals. They can do tasks quickly and with accuracy. Technology keeps improving every year.",
+
+    "Saving money is a smart habit. Even a small amount each week adds up. It helps during emergencies and teaches responsibility.",
+
+    "Taking breaks during study or work is helpful. A short walk or stretch can refresh your mind. Don’t forget to rest and avoid burnout.",
+
+    "A healthy diet includes fruits, vegetables, and water. Avoid too much sugar and junk food. Eating well gives you energy and focus.",
+
+    "Being kind doesn’t cost anything. A smile or a kind word can brighten someone’s day. Kindness spreads happiness and builds friendships.",
+
+    "Public transport is good for the environment. Buses and trains reduce traffic and pollution. Walking or cycling is also a great option.",
+
+    "A hobby makes your free time enjoyable. Painting, reading, gardening, or playing music are great ways to relax. Find something you love to do.",
+
+    "History teaches us about the past and how it shaped today. Knowing about famous people and events helps us learn from old mistakes.",
+
+    "Weather affects our plans and mood. Sunny days are cheerful, while rainy ones feel cozy. Always check the forecast before going out.",
+
+    "Volunteering helps you give back to the community. It also helps you gain skills, meet people, and feel good about helping others.",
+
+    "Your sleep schedule affects your energy and focus. Try going to bed and waking up at the same time. Good sleep is just as important as food or exercise.",
+
+    "Technology continues to evolve at an unprecedented pace, transforming industries and reshaping the global economy. Artificial intelligence, machine learning, and automation are becoming integral parts of modern businesses.",
+
+    "Environmental conservation has become a critical issue in the 21st century. Climate change, deforestation, and pollution threaten the planet's biodiversity and sustainability for future generations.",
+
+    "Education systems worldwide are adapting to digital transformation. Online learning platforms, virtual classrooms, and interactive technologies are revolutionizing traditional teaching methods and student engagement.",
+    
+    "The healthcare industry is experiencing revolutionary changes through telemedicine and digital health solutions. Remote patient monitoring and AI-powered diagnostics are improving access to quality medical care.",
+    
+    "Space exploration has entered a new era with private companies joining government agencies. Mars missions, lunar bases, and asteroid mining represent the next frontier of human achievement and scientific discovery.",
+    
+    "Social media platforms have fundamentally altered how people communicate and share information. These digital networks influence public opinion, political movements, and cultural trends across the globe.",
+    
+  ],
+  hard: [
+    "Philosophy challenges us to question everything we believe. From ethics to metaphysics, it forces us to think critically. The pursuit of truth requires open minds and rigorous debate.",
+
+    "Climate change poses a significant threat to global ecosystems. Rising temperatures, melting ice caps, and extreme weather events are increasing. Urgent action is needed to reduce greenhouse gas emissions.",
+
+    "Artificial intelligence is transforming industries across the globe. From healthcare to finance, AI systems automate tasks and offer predictive insights. But ethical concerns about privacy and bias remain.",
+
+    "Modern medicine has evolved through centuries of research. Breakthroughs in genetics and biotechnology offer hope for many diseases. Yet access to healthcare remains unequal in many regions.",
+
+    "Democracy relies on informed citizens and active participation. Voting, protesting, and community organizing shape policies and governance. A strong democracy values diverse opinions and free speech.",
+
+    "Space exploration advances scientific knowledge and global cooperation. Missions to Mars and the Moon aim to uncover the mysteries of our universe. Private companies are also accelerating innovation.",
+
+    "Economic inequality continues to widen in many parts of the world. Wealth is concentrated among the few, while millions struggle with poverty. Solutions must balance growth with social justice.",
+
+    "Neuroscience explores the structure and function of the brain. Discoveries in neural pathways and cognition help us understand behavior and consciousness. It remains one of science's final frontiers.",
+
+    "The legal system is built on rules, precedent, and fairness. Justice should be blind to status, wealth, or influence. True equality under the law is the goal of every democracy.",
+
+    "Globalization connects markets, cultures, and people worldwide. While it promotes trade and innovation, it also threatens local industries and traditions. Balance is needed for sustainable development.",
+
+    "Literature reflects the values, conflicts, and emotions of its time. Classic works continue to influence modern thought. Reading deeply builds empathy and cultural understanding.",
+
+    "Quantum mechanics defies our everyday logic. Particles can exist in multiple states and affect each other at a distance. These concepts challenge how we perceive reality itself.",
+
+    "Cybersecurity is crucial in the digital age. As data breaches and hacking increase, encryption and strong protocols become essential. Personal responsibility also plays a major role.",
+
+    "Cultural identity shapes how we see the world and relate to others. Language, tradition, and belief systems form our sense of belonging. Respect for diversity strengthens society.",
+
+    "The scientific method relies on observation, experimentation, and replication. Hypotheses are tested through data, not assumptions. This process drives progress across all disciplines.",
+
+    "Renewable energy technologies are revolutionizing power generation. Solar panels, wind turbines, and hydroelectric systems offer clean alternatives. Transitioning globally is a complex yet necessary process.",
+
+    "The theory of evolution explains the diversity of life through natural selection. Genetic variations allow species to adapt over generations. It remains a cornerstone of biological science.",
+
+    "Art history chronicles human creativity from ancient to modern times. Movements like realism, impressionism, and surrealism express social and personal narratives. Art remains a powerful form of communication.",
+
+    "Diplomacy requires patience, communication, and compromise. International relations often depend on alliances, treaties, and dialogue. Conflict resolution through peaceful means is always the ideal outcome.",
+
+    "Algorithms control more than we realize — from search results to social media feeds. Understanding how they work helps us question their influence. Transparency is key in algorithmic design.",
+
+    "Scientific literacy is essential in the 21st century. Being able to evaluate evidence and understand research protects against misinformation. It empowers individuals to make informed decisions.",
+
+    "Machine learning models improve with data and feedback. However, their outcomes depend heavily on the quality of the training set. Biases in data lead to biased predictions.",
+
+    "Public health involves education, prevention, and community support. Vaccination programs, sanitation, and awareness campaigns have saved countless lives. Its impact often goes unnoticed until a crisis emerges.",
+
+    "Modern architecture blends aesthetics with engineering. Sustainable materials, smart technology, and innovative design are changing how cities grow. Urban planning must consider both form and function.",
+
+    "Global crises often require collective action and empathy. Whether addressing pandemics or climate change, solutions depend on science, policy, and cooperation. Humanity must rise above division.",
+
+    "The epistemological implications of quantum mechanics continue to perplex philosophers and physicists alike. The Copenhagen interpretation suggests that observation fundamentally alters reality, challenging our conventional understanding of objectivity and measurement.",
+    
+    "Neuroplasticity research has revealed the brain's remarkable capacity for reorganization throughout life. Synaptic pruning, dendritic branching, and neurogenesis demonstrate the complex mechanisms underlying learning and memory consolidation.",
+    
+    "Cryptocurrency blockchain technology utilizes cryptographic hash functions and distributed consensus algorithms to maintain decentralized ledgers. Smart contracts enable autonomous execution of predetermined conditions without intermediary oversight.",
+    
+    "Phenomenological hermeneutics examines the interpretive structures inherent in human consciousness and experience. This philosophical approach investigates how meaning emerges through the dialectical relationship between understanding and historical context.",
+    
+    "Mitochondrial dysfunction has been implicated in numerous pathophysiological processes, including oxidative stress, apoptosis, and cellular senescence. These organelles serve as critical regulators of cellular metabolism and energy homeostasis.",
+    
+    "Postcolonial literary criticism deconstructs hegemonic narratives embedded within canonical texts, revealing how imperial ideologies perpetuate cultural marginalization and epistemological violence against subaltern populations.",
+  ],
+  // Custom text categories
+  programming: [
+    "function calculateTotal(items) { return items.reduce((sum, item) => sum + item.price, 0); } const users = await database.query('SELECT * FROM users WHERE active = true'); if (response.status === 200) { console.log('Success'); }",
+    "class APIHandler { constructor(baseURL) { this.baseURL = baseURL; } async getData(endpoint) { const response = await fetch(`${this.baseURL}/${endpoint}`); return response.json(); } } const api = new APIHandler('https://api.example.com');",
+    "import React, { useState, useEffect } from 'react'; const UserProfile = ({ userId }) => { const [user, setUser] = useState(null); useEffect(() => { fetchUserData(userId).then(setUser); }, [userId]); return <div>{user?.name}</div>; };",
+    "def process_data(data_list): filtered_data = [item for item in data_list if item['status'] == 'active'] return sorted(filtered_data, key=lambda x: x['timestamp'], reverse=True) result = process_data(user_data)",
+    "SELECT u.name, COUNT(o.id) as order_count FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.created_at >= '2024-01-01' GROUP BY u.id HAVING COUNT(o.id) > 5 ORDER BY order_count DESC;",
+    "git add . && git commit -m 'Add new feature: user authentication with JWT tokens' && git push origin feature/auth-system && echo 'Deployment complete' || echo 'Deployment failed'",
+  ],
+  quotes: [
+    "Be yourself; everyone else is already taken. - Oscar Wilde. The only way to do great work is to love what you do. - Steve Jobs. In the middle of difficulty lies opportunity. - Albert Einstein.",
+    "Life is what happens to you while you're busy making other plans. - John Lennon. The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt. It is during our darkest moments that we must focus to see the light. - Aristotle.",
+    "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill. The only impossible journey is the one you never begin. - Tony Robbins. Believe you can and you're halfway there. - Theodore Roosevelt.",
+    "The way to get started is to quit talking and begin doing. - Walt Disney. Innovation distinguishes between a leader and a follower. - Steve Jobs. Your time is limited, don't waste it living someone else's life. - Steve Jobs.",
+    "Twenty years from now you will be more disappointed by the things you didn't do than by the ones you did do. - Mark Twain. The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb.",
+    "Don't watch the clock; do what it does. Keep going. - Sam Levenson. Whether you think you can or you think you can't, you're right. - Henry Ford. The only person you are destined to become is the person you decide to be. - Ralph Waldo Emerson.",
+  ],
+  numbers: [
+    "Invoice #12345: $1,234.56 due by 2024-03-15. Account: 9876543210. Contact: +1-555-123-4567 ext. 890. Reference: TR-2024-Q1-001. Tax ID: 98-7654321. Routing: 123456789. Swift: ABCD1234.",
+    "Order #ORD-789012: 15 items @ $29.99 each = $449.85 + $67.48 tax = $517.33 total. Payment: ****-****-****-1234. Confirmation: CNF-456789. Tracking: 1Z999AA1234567890. Delivery: 2024-06-20.",
+    "IP Address: 192.168.1.1:8080. MAC: 00:1B:44:11:3A:B7. UUID: 550e8400-e29b-41d4-a716-446655440000. API  Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.",
+    "Coordinates: 40.7128° N, 74.0060° W. Elevation: 33 ft. Distance: 2.5 km. Speed: 65 mph. Time: 14:30:25 UTC. Temperature: 72°F / 22°C. Pressure: 1013.25 hPa. Humidity: 68%.",
+    "Version: 2.4.1-beta.3. Build: #20240315-1432. Commit: a1b2c3d4e5f6. Size: 1,024 KB. Memory: 512 MB. CPU: 2.4 GHz. Processes: 47. Threads: 128. Uptime: 7d 14h 23m 45s.",
+    "Portfolio: AAPL $150.25 (+2.5%), GOOGL $2,750.80 (-1.2%), MSFT $305.15 (+0.8%). Balance: $25,847.92. P&L: +$1,293.45 (5.27%). Volume: 1,234,567 shares. Market Cap: $2.8T.",
+  ],
+  business: [
+    "Dear valued stakeholder, we are pleased to announce our quarterly earnings report for Q1 2024. Revenue increased by 15.3% year-over-year, reaching $2.4 million. Our strategic initiatives have resulted in improved operational efficiency and enhanced customer satisfaction.",
+    "Following extensive market research and competitive analysis, we recommend expanding our product line to include eco-friendly alternatives. This initiative aligns with our corporate sustainability goals and addresses growing consumer demand for environmentally conscious products.",
+    "The project timeline has been updated to reflect recent scope changes. Phase 1 deliverables are due March 15th, with stakeholder review scheduled for March 20th. Budget allocation requires approval from the finance committee before proceeding to implementation.",
+    "Our customer retention rate has improved by 23% since implementing the new CRM system. Key performance indicators show increased engagement across all touchpoints. We anticipate continued growth in customer lifetime value through enhanced personalization strategies.",
+    "Please find attached the proposal for our digital transformation initiative. The implementation will require cross-functional collaboration between IT, marketing, and operations teams. Expected ROI is 275% within 18 months of deployment.",
+    "We are conducting a comprehensive audit of our supply chain processes to identify optimization opportunities. Initial findings suggest potential cost savings of 12-18% through vendor consolidation and improved inventory management protocols.",
+  ]
+};
+
+function getRandomText(difficulty) {
+  const selectedTexts = texts[difficulty];
+
+  // Shuffle all texts randomly
+  const shuffled = selectedTexts.sort(() => Math.random() - 0.5);
+
+  // Join them into one long string
+  return shuffled.join(" ");
+}
+
+
+// Form submission
+testForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  
+  const name = document.getElementById("username").value.trim();
+  const duration = parseInt(document.getElementById("duration").value);
+  const difficulty = document.getElementById("difficulty").value;
+
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  startTest(name, duration, difficulty);
+});
+
+// Custom test function
+function customTest(category) {
+  document.getElementById("username").value = "Custom Test User";
+  document.getElementById("duration").value = 120; // 2 minutes default for custom tests
+  document.getElementById("difficulty").value = "medium"; // Will be overridden
+  
+  // Start test with custom category
+  startCustomTest("Custom Test User", 120, category);
+}
+
+function startCustomTest(name, duration, category) {
+  testDuration = duration;
+  timeLeft = duration;
+  totalErrors = 0;
+  testStarted = false;
+  startTime = null;
+  currentDifficulty = category; // Store the custom category
+  
+  // Select random text from custom category
+  currentText = getRandomText(category);
+
+  // Show test UI and hide form
+  settingsForm.classList.add("hidden");
+  testContainer.classList.remove("hidden");
+
+  // Initialize display
+  updateTextDisplay();
+  inputArea.value = "";
+  inputArea.disabled = false;
+  inputArea.focus();
+
+  // Reset stats
+  timerDisplay.textContent = timeLeft;
+  wpmDisplay.textContent = "0";
+  accuracyDisplay.textContent = "100%";
+  progressDisplay.textContent = "0%";
+  progressBar.style.width = "0%";
+  resultsArea.classList.add("hidden");
+
+  // Clear any existing timer
+  clearInterval(timerInterval);
+}
+
+// Quick test buttons - keeping the original functionality too
+function quickTest(minutes) {
+  document.getElementById("username").value = "Quick Test User";
+  document.getElementById("duration").value = minutes * 60;
+  document.getElementById("difficulty").value = "medium";
+  
+  const event = new Event('submit');
+  testForm.dispatchEvent(event);
+}
+
+function startTest(name, duration, difficulty) {
+  testDuration = duration;
+  timeLeft = duration;
+  totalErrors = 0;
+  testStarted = false;
+  startTime = null;
+  currentDifficulty = difficulty; // Store the difficulty
+  
+  // Select random text based on difficulty
+  currentText = getRandomText(difficulty);
+
+  // Show test UI and hide form
+  settingsForm.classList.add("hidden");
+  testContainer.classList.remove("hidden");
+
+  // Initialize display
+  updateTextDisplay();
+  inputArea.value = "";
+  inputArea.disabled = false;
+  inputArea.focus();
+
+  // Reset stats
+  timerDisplay.textContent = timeLeft;
+  wpmDisplay.textContent = "0";
+  accuracyDisplay.textContent = "100%";
+  progressDisplay.textContent = "0%";
+  progressBar.style.width = "0%";
+  resultsArea.classList.add("hidden");
+
+  // Clear any existing timer
+  clearInterval(timerInterval);
+}
+
+// Input handling
+inputArea.addEventListener("input", () => {
+  if (!testStarted) {
+    testStarted = true;
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+  
+  updateDisplay();
+  updateTextDisplay();
+});
+
+function updateTextDisplay() {
+  const typed = inputArea.value;
+  let html = "";
+  
+  for (let i = 0; i < currentText.length; i++) {
+    const char = currentText[i];
+    
+    if (i < typed.length) {
+      if (typed[i] === char) {
+        html += `<span class="correct">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+      } else {
+        html += `<span class="incorrect">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+      }
+    } else if (i === typed.length) {
+      html += `<span class="current">${char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char}</span>`;
+    } else {
+      html += char === ' ' ? '&nbsp;' : char === '\n' ? '<br>' : char;
+    }
+  }
+  
+  textDisplay.innerHTML = html;
+  
+  // Scroll the current character into view smoothly
+  const currentChar = textDisplay.querySelector('.current');
+  if (currentChar) {
+    // Use a small delay to ensure smooth scrolling
+    setTimeout(() => {
+      const container = textDisplay;
+      const rect = currentChar.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      
+      if (rect.bottom > containerRect.bottom || rect.top < containerRect.top) {
+        currentChar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 10);
+  }
+}
+
+function updateDisplay() {
+  const typed = inputArea.value;
+  let correctChars = 0;
+  let errors = 0;
+
+  // Calculate accuracy
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) {
+      correctChars++;
+    } else {
+      errors++;
+    }
+  }
+
+  totalErrors = errors;
+  
+  // Calculate WPM
+  const timeSpent = testStarted ? (Date.now() - startTime) / 1000 / 60 : 0;
+  const wordsTyped = typed.length / 5;
+  const wpm = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  // Calculate accuracy
+  const accuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Calculate progress
+  const progress = Math.round((typed.length / currentText.length) * 100);
+  
+  // Update displays
+  wpmDisplay.textContent = wpm;
+  accuracyDisplay.textContent = `${accuracy}%`;
+  progressDisplay.textContent = `${Math.min(progress, 100)}%`;
+  progressBar.style.width = `${Math.min(progress, 100)}%`;
+  
+  // Check if test is complete
+  if (typed.length >= currentText.length) {
+    finishTest();
+  }
+}
+
+function updateTimer() {
+  timeLeft--;
+  timerDisplay.textContent = timeLeft;
+
+  if (timeLeft <= 0) {
+    finishTest();
+  }
+}
+
+function finishTest() {
+  clearInterval(timerInterval);
+  inputArea.disabled = true;
+  
+  // Calculate final stats
+  const typed = inputArea.value;
+  const timeSpent = (testDuration - timeLeft) / 60;
+  const wordsTyped = typed.length / 5;
+  const finalWPM = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  let correctChars = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) correctChars++;
+  }
+  
+  const finalAccuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Show results
+  document.getElementById("finalWPM").textContent = finalWPM;
+  document.getElementById("finalAccuracy").textContent = `${finalAccuracy}%`;
+  document.getElementById("totalWords").textContent = Math.round(wordsTyped);
+  document.getElementById("totalErrors").textContent = totalErrors;
+  
+  resultsArea.classList.remove("hidden");
+  
+  // Scroll to results
+  resultsArea.scrollIntoView({ behavior: 'smooth' });
+}
+
+function goToMenu() {
+  // Clear any running timer
+  clearInterval(timerInterval);
+  
+  // Show settings form and hide test
+  settingsForm.classList.remove("hidden");
+  testContainer.classList.add("hidden");
+  
+  // Reset form with current values for easy editing
+  // Keep the current values so user can modify them
+  if (!document.getElementById("username").value) {
+    document.getElementById("username").value = "Test User";
+  }
+  // Duration and difficulty will keep their current values
+  
+  // Focus on username field for quick editing
+  document.getElementById("username").focus();
+}
+
+function changeDifficulty(newDifficulty) {
+  // Only work if test is running
+  if (testContainer.classList.contains("hidden")) {
+    return; // Test not running
+  }
+  
+  // Clear any running timer
+  clearInterval(timerInterval);
+  
+  // Get current settings
+  const name = document.getElementById("username").value || "Test User";
+  const duration = parseInt(document.getElementById("duration").value) || 60;
+  
+  // Update difficulty in the form
+  document.getElementById("difficulty").value = newDifficulty;
+  
+  // Start new test with new difficulty
+  startTest(name, duration, newDifficulty);
+}
+
+function restartTest() {
+  // Instead of reloading the page, restart with current settings and new random text
+  clearInterval(timerInterval);
+  
+  // Get current settings
+  const name = document.getElementById("username").value || "Test User";
+  const duration = parseInt(document.getElementById("duration").value) || 60;
+  const difficulty = currentDifficulty;
+  
+  // Start new test with random text
+  startTest(name, duration, difficulty);
+}
+
+function shareResults() {
+  const wpm = document.getElementById("finalWPM").textContent;
+  const accuracy = document.getElementById("finalAccuracy").textContent;
+  const text = `I just completed a typing test on LeadTyping! 🎯\n\nMy Results:\n⚡ Speed: ${wpm} WPM\n🎯 Accuracy: ${accuracy}\n\nTry it yourself at LeadTyping!`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'My Typing Test Results',
+      text: text,
+      url: window.location.href
+    });
+  } else {
+    // Fallback - copy to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Results copied to clipboard!');
+    });
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !settingsForm.classList.contains('hidden')) {
+    restartTest();
+  }
+});
+function saveScore(name, wpm, accuracy, difficulty, duration) {
+  const score = {
+    name: name,
+    wpm: parseInt(wpm),
+    accuracy: parseInt(accuracy),
+    difficulty: difficulty,
+    duration: duration,
+    date: new Date().toISOString().split('T')[0],
+    timestamp: Date.now()
+  };
+  
+  let scores = getStoredScores();
+  scores.push(score);
+  
+  // Keep only top 100 scores to prevent storage issues
+  scores.sort((a, b) => {
+    if (b.wpm !== a.wpm) return b.wpm - a.wpm;
+    return b.accuracy - a.accuracy;
+  });
+  scores = scores.slice(0, 100);
+  
+  localStorage.setItem('typingTestScores', JSON.stringify(scores));
+  updateLeaderboard();
+  
+  // Show save confirmation
+  showScoreSaved();
+}
+
+function getStoredScores() {
+  try {
+    return JSON.parse(localStorage.getItem('typingTestScores') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+
+function updateLeaderboard() {
+  const scores = getStoredScores(); // Assume this returns an array of score objects
+  const allScoresContainer = document.getElementById('allScores');
+
+  // Clear existing content
+  allScoresContainer.innerHTML = '';
+
+  if (scores.length === 0) {
+    allScoresContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">No scores yet. Be the first!</p>';
+    return;
+  }
+
+  // Show all scores with scrollable container
+  scores.forEach((score, index) => {
+    const entry = createLeaderboardEntry(score, index + 1, false); // false: not top-only styling
+    allScoresContainer.appendChild(entry);
+  });
+}
+
+
+
+function resetLeaderboard() {
+  const confirmed = confirm("Are you sure you want to reset the leaderboard?");
+  if (confirmed) {
+    localStorage.removeItem('typingTestScores'); // ✅ Must match getStoredScores()
+    updateLeaderboard(); // ✅ Refresh the UI
+  }
+}
+
+
+
+
+
+function createLeaderboardEntry(score, rank, isTop) {
+  const entry = document.createElement('div');
+  const rankClass = rank <= 3 ? `rank-${rank}` : '';
+  const trophy = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+  
+  entry.className = `leaderboard-entry p-2 rounded text-sm ${rankClass}`;
+  entry.innerHTML = `
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="trophy font-bold">${trophy}</span>
+        <div>
+          <div class="font-medium">${score.name}</div>
+          <div class="text-xs opacity-75">${score.difficulty} • ${score.duration/60}min</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="font-bold">${score.wpm} WPM</div>
+        <div class="text-xs opacity-75">${score.accuracy}%</div>
+      </div>
+    </div>
+  `;
+  
+  return entry;
+}
+
+
+function showScoreSaved() {
+  // Create temporary notification
+  const notification = document.createElement('div');
+  notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 pulse-animation';
+  notification.textContent = '🎉 Score saved to leaderboard!';
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// 4. MODIFY YOUR EXISTING finishTest() FUNCTION
+// Replace your existing finishTest function with this updated version:
+
+function finishTest() {
+  clearInterval(timerInterval);
+  inputArea.disabled = true;
+  
+  // Calculate final stats
+  const typed = inputArea.value;
+  const timeSpent = (testDuration - timeLeft) / 60;
+  const wordsTyped = typed.length / 5;
+  const finalWPM = timeSpent > 0 ? Math.round(wordsTyped / timeSpent) : 0;
+  
+  let correctChars = 0;
+  for (let i = 0; i < typed.length; i++) {
+    if (typed[i] === currentText[i]) correctChars++;
+  }
+  
+  const finalAccuracy = typed.length > 0 ? Math.round((correctChars / typed.length) * 100) : 100;
+  
+  // Show results
+  document.getElementById("finalWPM").textContent = finalWPM;
+  document.getElementById("finalAccuracy").textContent = `${finalAccuracy}%`;
+  document.getElementById("totalWords").textContent = Math.round(wordsTyped);
+  document.getElementById("totalErrors").textContent = totalErrors;
+  
+  // Save score to leaderboard
+  const playerName = document.getElementById("username").value || "Anonymous";
+  saveScore(playerName, finalWPM, finalAccuracy, currentDifficulty, testDuration);
+  
+  resultsArea.classList.remove("hidden");
+  
+  // Scroll to results
+  resultsArea.scrollIntoView({ behavior: 'smooth' });
+}
+
+// 5. ADD THIS TO INITIALIZE LEADERBOARD WHEN PAGE LOADS
+// Add this at the very end of your script tag:
+
+// Initialize leaderboard when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  updateLeaderboard();
+});
+
+// Optional: Add clear leaderboard function (you can add a button for this)
+function clearLeaderboard() {
+  if (confirm('Are you sure you want to clear all scores? This cannot be undone.')) {
+    localStorage.removeItem('typingTestScores');
+    updateLeaderboard();
+  }
+}
+</script>
+
+>>>>>>> Stashed changes
 </body>
 </html>
