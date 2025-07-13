@@ -2,7 +2,8 @@
 
 **LeadTyping** is a clean and interactive typing speed test web app that helps users improve their typing skills through engaging UI, real-time feedback, and performance tracking.
 
-![LeadTyping Demo](https://github.com/TANUSH-afk052/Lead-Typing/assets/banner.png)  
+![LeadTyping Demo](https://raw.githubusercontent.com/TANUSH-afk052/Lead-Typing/main/assets/banner.png)
+  
 
 ---
 
