@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>TypeSpeed Pro</title>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">TypeSpeed Pro</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">TIME</div>
+                    <div class="stat-value" id="timer">30</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">SCORE</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">WORDS</div>
+                    <div class="stat-value" id="words-typed">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">BEST</div>
+                    <div class="stat-value" id="high-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="level">1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="start-screen">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #333;">Ready to Type?</h2>
+            <p class="instruction">Type the falling words before they disappear!<br>Each correct word gives you +2 points and +3 seconds!<br>Game gets harder as you progress!</p>
+            <button class="start-btn" onclick="startGame()">START GAME</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="input-area">
+                <input type="text" class="word-input" id="wordInput" placeholder="Type the words here..." disabled>
+            </div>
+        </div>
+
+        <div class="game-over-screen hidden" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2 class="game-over-title">Game Over!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <div class="score-label">Final Score</div>
+                <div class="performance-stats">
+                    <div class="performance-row">
+                        <span>Words Typed:</span>
+                        <span id="finalWords">0</span>
+                    </div>
+                    <div class="performance-row">
+                        <span>Level Reached:</span>
+                        <span id="finalLevel">1</span>
+                    </div>
+                    <div class="performance-row">
+                        <span>Accuracy:</span>
+                        <span id="accuracy">100%</span>
+                    </div>
+                    <div class="performance-row">
+                        <span>WPM:</span>
+                        <span id="wpm">0</span>
+                    </div>
+                    <div class="performance-row" id="newHighScoreRow" style="display: none; color: #FFD700; font-weight: bold;">
+                        <span>🏆 NEW HIGH SCORE! 🏆</span>
+                        <span></span>
+                    </div>
+                </div>
+                <button class="restart-btn" onclick="restartGame()">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+
+
+</body>
+</html>
