@@ -23,6 +23,7 @@
 - 📊 Session performance summary
 - 📁 Local leaderboard tracking (on your device)
 - 🔄 Reset & retry functionality
+- 🎮 A simple word falling game
 
 ---
 
